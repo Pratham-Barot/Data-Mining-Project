@@ -2,13 +2,13 @@ import streamlit as st
 import pickle
 import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
-from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
 import nltk
 import re
 
-# Download stopwords
+# Download stopwords if not available
 nltk.download('stopwords')
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
 
 # Load your trained model and vectorizer
 model = joblib.load("model.pkl")
@@ -35,6 +35,3 @@ if st.button("Predict"):
     prediction = model.predict(vectorized)[0]
     result = "🟥 Fake News" if prediction == 1 else "🟩 Real News"
     st.subheader(f"Prediction: {result}")
-
-import nltk
-nltk.download('stopwords')
