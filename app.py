@@ -1,37 +1,38 @@
 import streamlit as st
 import pickle
-import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
-import nltk
 import re
+import nltk
 
-# Download stopwords if not available
+# Download stopwords if needed
 nltk.download('stopwords')
-from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
 
-# Load your trained model and vectorizer
-model = joblib.load("model.pkl")
-vectorizer = joblib.load("vectorizer.pkl")
-
-ps = PorterStemmer()
-stop_words = set(stopwords.words('english'))
-
-def clean_text(text):
-    text = text.lower()
-    text = re.sub('[^a-zA-Z]', ' ', text)
-    text = text.split()
-    text = [ps.stem(word) for word in text if word not in stop_words]
-    return ' '.join(text)
+# Load your trained model
+model = pickle.load(open('model.pkl', 'rb'))
+vectorizer = pickle.load(open('vectorizer.pkl', 'rb'))
 
 st.title("📰 Fake News Detection App")
-st.write("Enter a news headline or article text below:")
 
-user_input = st.text_area("News Text")
+# User input
+user_input = st.text_area("📝 Enter any news text below:")
+
+# Preprocessing function
+def clean_text(text):
+    text = re.sub(r'[^a-zA-Z]', ' ', text)
+    text = text.lower()
+    text = text.split()
+    from nltk.corpus import stopwords
+    text = [word for word in text if word not in stopwords.words('english')]
+    return " ".join(text)
 
 if st.button("Predict"):
-    cleaned = clean_text(user_input)
-    vectorized = vectorizer.transform([cleaned]).toarray()
-    prediction = model.predict(vectorized)[0]
-    result = "🟥 Fake News" if prediction == 1 else "🟩 Real News"
-    st.subheader(f"Prediction: {result}")
+    if user_input.strip() == "":
+        st.warning("⚠️ Please enter some text to predict.")
+    else:
+        cleaned_text = clean_text(user_input)
+        vectorized_text = vectorizer.transform([cleaned_text])
+        prediction = model.predict(vectorized_text)[0]
+        if prediction == 1:
+            st.success("✅ This looks like REAL news!")
+        else:
+            st.error("❌ This seems to be FAKE news!")
