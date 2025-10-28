@@ -1,5 +1,5 @@
 import streamlit as st
-import pickle
+import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 import re
 import nltk
@@ -8,8 +8,8 @@ import nltk
 nltk.download('stopwords')
 
 # Load your trained model
-model = pickle.load(open('model.pkl', 'rb'))
-vectorizer = pickle.load(open('vectorizer.pkl', 'rb'))
+model = joblib.load("model.pkl")
+vectorizer = joblib.load("vectorizer.pkl")
 
 st.title("📰 Fake News Detection App")
 
